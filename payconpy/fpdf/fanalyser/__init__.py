@@ -1,5 +1,0 @@
-"""
-DIREITOS RESERVADOS / RIGHTS RESERVED / DERECHOS RESERVADOS
-
-gabriellopesdesouza2002@gmail.com
-"""

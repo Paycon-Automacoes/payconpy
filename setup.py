@@ -41,17 +41,11 @@ with open("README.md", "r", encoding='utf-8') as fh:
             'bs4',
             'requests',
             'html5lib',
-            'openpyxl',
             'webdriver-manager',
             'pretty-html-table',
-            'packaging',
-            'PySimpleGUI',
-            'macholib',
-            'wget',
+            'PySimpleGUI==4.60.0',
             'winotify',
-            'pypdf',
             'xlsxwriter',
-            'PyPDF2',
             'pandas',
             'sqlalchemy',
             'rich',
@@ -66,6 +60,5 @@ with open("README.md", "r", encoding='utf-8') as fh:
         'openai': [ # for chatpdf
             'openai',
         ],
-        
         },
         )

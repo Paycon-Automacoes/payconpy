@@ -123,7 +123,6 @@ def envia_email_gmail(
     msg = MIMEMultipart()
 
     # para quem está indo a msg
-    # 'gabriel.souza.paycon@gmail.com;gablop6543@gmail.com'
     if isinstance(emails_to, str):
         emails_to = extrair_email(emails_to)
         if len(emails_to) == 0:
