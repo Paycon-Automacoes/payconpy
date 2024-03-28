@@ -57,8 +57,8 @@ with open("README.md", "r", encoding='utf-8') as fh:
             'PyMuPDF',
         ],
         extras_require={
-        'openai': [ # for chatpdf
-            'openai',
-        ],
-        },
-        )
+            'openai': [ # for chatpdf
+                'openai',
+            ],
+    },
+)

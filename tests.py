@@ -57,44 +57,38 @@ def testa_compressao_de_pdf():
 
 def testa_download_de_arquivo():
     import requests
-    from tqdm import tqdm
 
     def download_file_from_github(url, save_path):
         """
-        Baixa um arquivo do GitHub e salva no caminho especificado.
+        Baixa um arquivo do GitHub garantindo que o stream seja tratado corretamente,
+        o que é crucial para arquivos grandes.
         
         Args:
-            url (str): URL do arquivo raw no GitHub.
-            save_path (str): Caminho local para salvar o arquivo baixado.
+            url (str): URL do arquivo no GitHub.
+            save_path (str): Caminho local onde o arquivo será salvo.
         """
-        # Obtenha a resposta da URL como um stream para baixar grandes arquivos
-        response = requests.get(url, stream=True)
-        
-        # Total size in bytes.
-        total_size = int(response.headers.get('content-length', 0))
-        block_size = 1024  # 1 Kibibyte
-        t = tqdm(total=total_size, unit='iB', unit_scale=True)
-        
-        # Abre o arquivo para escrita e começa a escrever os chunks baixados
-        with open(save_path, 'wb') as file:
-            for data in response.iter_content(block_size):
-                t.update(len(data))
-                file.write(data)
-        t.close()
-        
-        if total_size != 0 and t.n != total_size:
-            print("ERROR, something went wrong")
+        with requests.get(url, stream=True) as response:
+            # Verifica se a requisição foi bem sucedida
+            response.raise_for_status()
+            with open(save_path, 'wb') as file:
+                # Escreve o conteúdo do arquivo em chunks para não sobrecarregar a memória
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
 
-    # URL para o arquivo raw do tesseract.zip no GitHub
-    url = "https://github.com/Paycon-Automacoes/payconpy/raw/main/.gitignore"
+    # URL para o arquivo raw do tesseract_bin_pt.zip no GitHub
+    url = "https://github.com/Paycon-Automacoes/payconpy/raw/main/tesseract_bin_pt.zip"
 
     # Caminho local onde o arquivo zip será salvo
-    save_path = ".gitignore_2"
+    save_path = "tesseract_bin_pt.zip"
 
     # Chamada da função de download
     download_file_from_github(url, save_path)
 
 
+def testar_ocr_tesseract():
+    from payconpy.fpdf.focr.orc import ocr_tesseract_v2
+    print(ocr_tesseract_v2('files_tests\Banco Pan.pdf'))
+
 
 if __name__ == '__main__':
-    testa_download_de_arquivo()
+    testar_ocr_tesseract()

@@ -509,3 +509,5 @@ $RECYCLE.BIN/
 
 files_tests
 tests.py
+bin
+*logs*

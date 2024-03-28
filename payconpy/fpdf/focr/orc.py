@@ -1,5 +1,6 @@
 from payconpy.fpython.fpython import *
 from payconpy.fpdf.pdfutils.pdfutils import split_pdf
+from payconpy.utils.utils import download_file_from_github
 from tqdm import tqdm
 from PIL import Image
 import numpy as np
@@ -124,7 +125,38 @@ def ocr_google_vision(pdf, api_key, dpi=300, file_output=uuid.uuid4(), return_te
     
     
     
-def ocr_tesseract_v2(pdf, dpi=300, file_output=uuid.uuid4(), return_text=True, config_tesseract='', limit_pages=None, lang='por', timeout=120):
+def ocr_tesseract_v2(pdf, dpi=300, file_output=uuid.uuid4(), return_text=True, config_tesseract='', limit_pages=None, lang='por', timeout=120, download_tesseract=False):
+    """Realiza OCR em um arquivo PDF usando Tesseract, com opções de customização avançadas.
+
+    Esta função avançada permite a personalização de diversos parâmetros do OCR, como DPI, linguagem, limitação de páginas e timeout. Caso os binários do Tesseract não estejam presentes, ela executa uma única requisição para o GitHub da organização Paycon para baixar os binários necessários. Esta requisição é crucial para a funcionalidade da função mas levanta questões importantes sobre segurança de dados.
+
+    Importância da Segurança dos Dados na Requisição:
+        - Embora o arquivo ZIP do Tesseract seja público e hospedado em um repositório confiável, é fundamental validar a fonte antes do download para evitar a execução de software malicioso.
+        - Durante o desenvolvimento, é aconselhável ter o Tesseract pré-instalado no projeto, eliminando a necessidade do download e reduzindo a superfície de ataque.
+        - Para ambientes de produção, deve-se considerar a implementação de verificações de integridade, como a validação de checksum, para garantir a autenticidade dos binários baixados.
+
+    Args:
+        pdf (str): Caminho do arquivo PDF para realizar o OCR.
+        dpi (int, optional): Resolução DPI para a conversão de páginas PDF em imagens. Padrão é 300.
+        file_output (str, optional): Nome do arquivo de saída onde o texto OCR será salvo. Gera um UUID por padrão.
+        return_text (bool, optional): Se True, retorna o texto extraído; se False, retorna o caminho para o arquivo de texto. 
+            Padrão é True.
+        config_tesseract (str, optional): Configurações adicionais para o Tesseract. Padrão é ''.
+        limit_pages (int, optional): Limita o número de páginas do PDF a serem processadas. Padrão é None.
+        lang (str, optional): Código de idioma usado pelo Tesseract para o OCR. Padrão é 'por' (português).
+        timeout (int, optional): Timeout em segundos para o processamento OCR de cada página. Padrão é 120.
+
+    Retorna:
+        str|bool: Retorna o texto extraído ou o caminho para o arquivo de texto se `return_text` for False. 
+            Retorna False em caso de falha no processamento OCR.
+
+    Nota:
+        - A função tenta baixar os binários do Tesseract apenas se estes não estiverem presentes, para evitar downloads desnecessários e mitigar riscos de segurança.
+        - A segurança dos dados e a integridade do software são primordiais, especialmente ao realizar downloads de fontes externas.
+        
+    Raises:
+        Exception: Pode lançar uma exceção se ocorrer um erro durante o download dos binários, o processamento OCR ou se a integridade do arquivo baixado for questionável.
+    """
     path_exit = arquivo_com_caminho_absoluto('temp_tess', 'Tesseract-OCR.zip')
     path_tesseract_extract = arquivo_com_caminho_absoluto('bin', 'Tesseract-OCR')
     path_tesseract = arquivo_com_caminho_absoluto(('bin', 'Tesseract-OCR'), 'tesseract.exe')
@@ -133,7 +165,7 @@ def ocr_tesseract_v2(pdf, dpi=300, file_output=uuid.uuid4(), return_text=True, c
         faz_log('Baixando binários do Tesseract, aguarde...')
         cria_dir_no_dir_de_trabalho_atual('temp_tess')
         cria_dir_no_dir_de_trabalho_atual('bin')
-        gdown.download('https://drive.google.com/uc?id=1yX6I7906rzo3YHK5eTmdDOY4FulpQKJ-', path_exit, quiet=True)
+        download_file_from_github('https://github.com/Paycon-Automacoes/payconpy/raw/main/tesseract_bin_pt.zip', path_exit)
         sleep(1)
         with zipfile.ZipFile(path_exit, 'r') as zip_ref:
             # Obtém o nome da pasta interna dentro do arquivo ZIP

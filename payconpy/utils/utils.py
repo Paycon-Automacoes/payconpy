@@ -1,4 +1,5 @@
 import pandas as pd
+import requests
 from payconpy.fpython.fpython import faz_log, cria_dir_no_dir_de_trabalho_atual, arquivo_com_caminho_absoluto
 import os
 from sqlalchemy import create_engine
@@ -391,7 +392,24 @@ sys.path.append(root_dir)
     print('Criado!')
     print('Baixando pacotes')
     os.system(f'.\\venv\Scripts\\pip.exe install {packages}')
+
+
+def download_file_from_github(url, save_path):
+    """
+    Baixa um arquivo do GitHub garantindo que o stream seja tratado corretamente,
+    o que é crucial para arquivos grandes.
     
+    Args:
+        url (str): URL do arquivo no GitHub.
+        save_path (str): Caminho local onde o arquivo será salvo.
+    """
+    with requests.get(url, stream=True) as response:
+        # Verifica se a requisição foi bem sucedida
+        response.raise_for_status()
+        with open(save_path, 'wb') as file:
+            # Escreve o conteúdo do arquivo em chunks para não sobrecarregar a memória
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
 
 
 
