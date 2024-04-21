@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-version = '1.0.0'
+version = '2.1.0'
 
 with open("README.md", "r", encoding='utf-8') as fh:
     readme = fh.read()
@@ -21,10 +21,6 @@ with open("README.md", "r", encoding='utf-8') as fh:
             os.path.join('payconpy', 'femails'),
             os.path.join('payconpy', 'fexceptions'),
             os.path.join('payconpy', 'fpdf'),
-            os.path.join('payconpy', 'fpdf', 'fanalyser'),
-            os.path.join('payconpy', 'fpdf', 'fcompress'),
-            os.path.join('payconpy', 'fpdf', 'fhtml_to_pdf'),
-            os.path.join('payconpy', 'fpdf', 'fimgpdf'),
             os.path.join('payconpy', 'fpdf', 'focr'),
             os.path.join('payconpy', 'fpdf', 'pdfutils'),
             os.path.join('payconpy', 'fpysimplegui'),
@@ -34,6 +30,8 @@ with open("README.md", "r", encoding='utf-8') as fh:
             os.path.join('payconpy', 'utils'),
             os.path.join('payconpy', 'openai'),
             os.path.join('payconpy', 'openai', 'assistants'),
+            os.path.join('payconpy', 'openai', 'apis'),
+            os.path.join('payconpy', 'odoo'),
         ],
         
         install_requires= [
@@ -44,7 +42,6 @@ with open("README.md", "r", encoding='utf-8') as fh:
             'webdriver-manager',
             'pretty-html-table',
             'PySimpleGUI==4.60.0',
-            'winotify',
             'xlsxwriter',
             'pandas',
             'sqlalchemy',
@@ -52,7 +49,6 @@ with open("README.md", "r", encoding='utf-8') as fh:
             'pyinstaller==5.12.0',
             # for ocr
             'opencv-python==4.8.1.78',
-            'gdown',
             'pytesseract',
             'PyMuPDF',
         ],

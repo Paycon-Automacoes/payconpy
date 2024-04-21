@@ -1,5 +1,7 @@
-import fitz
 from payconpy.fpython.fpython import *
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+import fitz, io
 
 def extract_pages(original_pdf_path, new_pdf_path, num_pages):
     """
@@ -80,3 +82,76 @@ def split_pdf(input_path, output_dir='output_split', interval=30):
     
     # Retorna a lista de arquivos no diretório de saída
     return arquivos_com_caminho_absoluto_do_arquivo(output_dir)
+
+
+def text_to_pdf(text:str, filename:str, left_margin:int=70, bottom_margin:int=40, font:str='Helvetica', font_size:int=12) -> str:
+    """Convert docstring to PDF
+
+    Args:
+        text (str): Docstring text for input to PDF
+        filename (_type_): filename for output
+
+    Returns:
+        str: returns filename of PDF
+    """
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    
+    # Set margins
+    right_margin = width - left_margin
+    top_margin = height - bottom_margin
+    
+    # Prepare text
+    text = text.strip().split('\n')
+    
+    # Start Y position from top margin
+    y_position = top_margin
+    x_position = left_margin
+
+    # Create a function to add pages if the text overflows
+    def add_page_if_needed(c, y_position, bottom_margin):
+        if y_position < bottom_margin:
+            c.showPage()
+            return top_margin  # Reset Y position back to top
+        else:
+            return y_position
+
+    # Write the text line by line
+    for line in text:
+        # Text wrapping: split the line into a list of words
+        words = line.split()
+        text_line = ''
+        
+        for word in words:
+            # Check the width of the line or word
+            line_width = c.stringWidth(text_line + " " + word, font, font_size)
+            
+            # If the line is too wide, draw it and start a new one
+            if line_width > (right_margin - left_margin):
+                c.drawString(x_position, y_position, text_line)
+                y_position -= 15
+                y_position = add_page_if_needed(c, y_position, bottom_margin)
+                text_line = word
+            else:
+                # Add word to line
+                text_line += (" " + word) if text_line else word
+
+        # Draw the last line for the current sentence and move to next line
+        c.drawString(x_position, y_position, text_line)
+        y_position -= 15
+        y_position = add_page_if_needed(c, y_position, bottom_margin)
+
+    # End writing and save the PDF
+    c.showPage()
+    c.save()
+    
+    # Move buffer position to the beginning and save PDF to file
+    buffer.seek(0)
+    with open(filename, 'wb') as f:
+        f.write(buffer.read())
+
+    # Close the buffer
+    buffer.close()
+    
+    return filename

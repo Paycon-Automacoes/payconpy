@@ -7,6 +7,7 @@ Aqui voce achara funcoes produzidas para ter maior agilidade nos desenvolvimento
 * Selenium
 * Tesseract
 * Python
+* OpenAI
 
 ## Instalacao
 
@@ -14,4 +15,4 @@ pip install payconpy em seu ambiente virtual e pronto!
 
 Powered By: [Paycon Automações](https://github.com/Paycon-Automacoes)
 
-# Current Version -> 1.0.0
+# Current Version -> 2.1.0

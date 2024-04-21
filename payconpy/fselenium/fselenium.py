@@ -995,3 +995,38 @@ def recupera_text_de_todo_um_site(url:str, tag_name:str='body', no_escape_sequen
     else:
         return soup.find(tag_name).text.replace(u'\xa0', u' ')
 
+def espera_input_limpa_e_envia_send_keys_action_chains(wdw:WebDriverWait, keys : str, locator : tuple, in_dom=False) -> None:
+    from selenium.common.exceptions import StaleElementReferenceException
+    """
+    ### Função espera pelo input ou textarea indicado pelo locator, limpa ele e envia os dados
+
+    Args:
+        driver (WebDriver): Seu webdriver
+        wdw (WebDriverWait): WebDriverWait criado em seu código
+        keys (str): Sua string para enviar no input ou textarea
+        locator (tuple): Tupla que contém a forma e o caminho do elemento (By.CSS_SELECTOR, '#myelementid')
+        click (bool): Clica ou não no elemento
+    """
+    driver = wdw._driver
+    try:
+        if in_dom:
+            wdw.until(EC.presence_of_element_located(locator))
+        else:
+            wdw.until(EC.element_to_be_clickable(locator))
+            
+        element = driver.find_element(By.CSS_SELECTOR, 'input[class*="rich-inslider-field-right rich-inslider-field"]')
+        ActionChains(driver).click(element).perform()
+        element.send_keys(Keys.CONTROL + "a")
+        element.send_keys(Keys.DELETE)
+        for char in keys:
+            element.send_keys(char)
+    except StaleElementReferenceException:
+        if in_dom:
+            wdw.until(EC.presence_of_element_located(locator))
+        else:
+            wdw.until(EC.element_to_be_clickable(locator))
+        ActionChains(driver).click(element).perform()
+        element.send_keys(Keys.CONTROL + "a")
+        element.send_keys(Keys.DELETE)
+        for char in keys:
+            element.send_keys(char)

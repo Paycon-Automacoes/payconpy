@@ -5,18 +5,64 @@
 """
 
 ################################## IMPORTS #############################################
+import os, sys, shutil, platform, re, logging,\
+    unicodedata, gc, requests, time, json,\
+        threading, base64, random, uuid
 from configparser import RawConfigParser
 from datetime import datetime, date, timedelta
 from fnmatch import fnmatch
 from time import sleep
-import os, sys, shutil, platform, re, logging, unicodedata, gc, requests, time, json, threading
 import subprocess as sp
 import zipfile
 from rich import print
 from numpy import unicode_
 ################################## IMPORTS #############################################
 
-def remover_acentos(text:str, encoding:str='utf-8'):
+def generate_uuid() -> str:
+    """Generate uuid
+
+    Returns:
+        str: uuid
+    """
+    return str(uuid.uuid4())
+
+def file_to_base64(file) -> str:
+    """Convert any file to base64
+
+    Args:
+        file (str): File to convert (path)
+
+    Returns:
+        str: file represented in base64
+    """
+    with open(os.path.abspath(file), "rb") as arquivo:
+        base64_ = base64.b64encode(arquivo.read())
+        return base64_.decode("utf-8")
+
+def base64_to_file(base64_string:str, output_file:str) -> None:
+    """Convert any base64 to file
+
+    Args:
+        base64_string (str): base64 represented in string
+        base64_string (str): File to convert (path)
+
+    Returns:
+        None: None
+    """
+    with open(output_file, "wb") as f:
+        image_data = base64.b64decode(base64_string)
+        f.write(image_data)
+
+def random_sleep(min, max) -> None:
+    """Run a random sleep when searching for requests to avoid IP blocks
+
+    Args:
+        min (int|float): Min value to sleep
+        max (int|float): Max value to sleep
+    """
+    sleep(random.uniform(min, max))
+
+def remover_acentos(text:str, encoding:str='utf-8') -> str:
 	try:
 		text = unicode_(text, encoding=encoding)
 	except Exception:
@@ -24,14 +70,16 @@ def remover_acentos(text:str, encoding:str='utf-8'):
 	text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode("utf-8")
 	return str(text)
 
-def getsizefile(path_file:str, return_convet_bytes: bool=False):
+def getsizefile(path_file:str, return_convet_bytes: bool=False) -> int|str:
     """
-    Função retorna o valor da função os.path.getsize()
+    getsizefile in bytes, KB, MB, GB, TB, PB
     
     Args:
-        path_file (str): O caminho do arquivo relativo
-        return_convet_bytes (str): Converte o valor de bits para  B = Byte K = Kilo M = Mega G = Giga T = Tera P = Peta
-        
+        path_file (str): Relative path of the file
+        return_convet_bytes (str): convert the value of bits -> B = Byte K = Kilo M = Mega G = Giga T = Tera P = Peta
+    
+    Returns:
+        int|str: Value of the function os.path.getsize()
     """
     FILE_PATH_ABSOLUTE = os.path.getsize(os.path.abspath(path_file))
     if return_convet_bytes:
@@ -64,7 +112,7 @@ def executa_garbage_collector(generation :int=False) -> int:
         return gc.collect()
 
 
-def verifica_se_esta_conectado_na_vpn(ping_host :str):
+def verifica_se_esta_conectado_na_vpn(ping_host :str) -> None:
     PING_HOST = ping_host
     """O método verificará por ping se está conectado no ip da VPN"""
 
@@ -77,7 +125,7 @@ def verifica_se_esta_conectado_na_vpn(ping_host :str):
         faz_log("VPN conectada com sucesso!")
 
 
-def transforma_lista_em_string(lista :list):
+def transforma_lista_em_string(lista :list) -> str:
     try:
         return ', '.join(lista)
     except TypeError:
